@@ -13,25 +13,42 @@ class Application {
     $this->config = array_merge($this->config, $config);
   }
   
-  public function addRoute($path, $callback) {
-    $compiled_path = str_replace('/', '\/', $path);
-    $compiled_path = '/^' . preg_replace('/[{][^}]*[}]/', '([^\/]*)', $compiled_path) . '$/i';
-
-    $this->routes[] = array(
-      'path' => $path,
-      'compiled_path' => $compiled_path,
-      'callback' => $callback
-    );
+  public function get($path, $callback) {
+    $this->addRoute('GET', $path, $callback);
   }
   
-  public function request() {
-    $url_parts = parse_url($_SERVER['REQUEST_URI']);
-    $path = str_replace($this->config['BASE_PATH'], '', $url_parts['path']);
+  public function post($path, $callback) {
+    $this->addRoute('POST', $path, $callback);
+  }
+  
+  public function put($path, $callback) {
+    $this->addRoute('PUT', $path, $callback);
+  }
+  
+  public function delete($path, $callback) {
+    $this->addRoute('DELETE', $path, $callback);
+  }
+  
+  public function head($path, $callback) {
+    $this->addRoute('HEAD', $path, $callback);
+  }
+  
+  public function options($path, $callback) {
+    $this->addRoute('OPTIONS', $path, $callback);
+  }
+  
+  private function addRoute($method, $path, $callback) {
+    $this->routes[] = new Route($method, $path, $callback);
+  }
+  
+  public function run(Request $request = null) {
+    if ($request === null) {
+      $request = Request::createFromGlobals();
+    }
     
     foreach ($this->routes as $route) {
-      if (preg_match($route['compiled_path'], $path, $args)) {
-        array_shift($args);
-        return call_user_func_array($route['callback'], $args);
+      if ($route->matches($request, $this->config['BASE_PATH'])) {
+        return $route->execute($request, $this->config['BASE_PATH']);
       }
     }
   }
