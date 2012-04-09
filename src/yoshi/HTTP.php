@@ -29,10 +29,6 @@ class HTTP {
     }  
   }
 
-  public function redirect($uri) {
-    header('Location: ' . $uri);
-  }
-
 }
 
 ?>
