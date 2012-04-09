@@ -5,13 +5,6 @@ namespace yoshi;
 class Application {
   
   private $routes = array();
-  private $config = array(
-    'BASE_PATH' => ''
-  );
-  
-  public function __construct($config = array()) {
-    $this->config = array_merge($this->config, $config);
-  }
   
   public function get($path, $callback, $callback_method = null) {
     return $this->addRoute('GET', $path, $callback, $callback_method);
@@ -52,8 +45,8 @@ class Application {
     }
     
     foreach ($this->routes as $route) {
-      if ($route->matches($request, $this->config['BASE_PATH'])) {
-        return $route->execute($request, $this->config['BASE_PATH']);
+      if ($route->matches($request)) {
+        return $route->execute($request);
       }
     }
   }

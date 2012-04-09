@@ -19,19 +19,19 @@ class Route {
     $this->callback = $callback;
   }
   
-  public function matches(Request $request, $base_path = '') {
-    return count($this->_matches($request, $base_path)) > 0;
+  public function matches(Request $request) {
+    return count($this->_matches($request)) > 0;
   }
   
-  public function execute(Request $request, $base_path = '') {
-    if (count($matches = $this->_matches($request, $base_path)) > 0) {
+  public function execute(Request $request) {
+    if (count($matches = $this->_matches($request)) > 0) {
       array_shift($matches);
       return call_user_func_array($this->callback, $matches);
     }
   }
   
-  private function _matches(Request $request, $base_path) {
-    $path = str_replace($base_path, '', $request->getRequestUriPath());
+  private function _matches(Request $request) {
+    $path = str_replace($request->getRootUri(), '', $request->getRequestUriPath());
     $method = $request->getRequestMethod();
   
     preg_match($this->compiled_path, $method . '#' . $path, $matches);
