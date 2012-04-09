@@ -1,7 +1,7 @@
 Yoshi
 =====
 
-A PHP micro-framework. Similar to [Silex][1] or [SlimPHP][2].
+A PHP micro-framework. Similar to [Silex][1] or [Slim][2].
 
 ```php
 <?php
