@@ -2,6 +2,8 @@
 
 namespace yoshi;
 
+use Exception;
+
 class View {
   
   protected $view;
@@ -9,23 +11,21 @@ class View {
   protected $variables = array();
   protected $helpers = array();
   
-  public static function create($view, $layout = null) {
-    return new static($view, $layout);
-  }
-  
   public function __construct($view, $layout = null) {
     $this->view = $view;
-    $this->layout == null and $this->layout = 'views' . DS . 'layouts' . DS . 'application.php';
-    $this->set('view', $view);
+    $this->layout = $layout;
   }
   
-  public function set($key, $value) {
+  public function bind($key, $value) {
     $this->variables[$key] = $value;
     return $this;
   }
   
-  public function registerHelper($helper, $name) {
-    $this->helpers[$name] = $helper;
+  public function helper($name, $callback) {
+    if (method_exists($this, $name)) {
+      throw new Exception(sprintf('Can\'t use helper with the name %s, since this name is already used as a method name inside of the View class.', $name));
+    }
+    $this->helpers[$name] = $callback;
     return $this;
   }
   
@@ -33,20 +33,28 @@ class View {
     $helper = $this->helpers[$name];
     
     if ($helper != null) {
-      return call_user_func(array($helper, $name), $arguments);
+      return call_user_func_array($helper, $arguments);
     }
   }
   
   public function render() {
+    if (file_exists($this->view) === false) {
+      throw new Exception(sprintf('Template file %s was not found.', $this->view));
+    }
+    
     extract($this->variables);
     
     ob_start();
-    include APP_PATH . 'views' . DS . $this->view . '.php';
+    include $this->view;
     $content = ob_get_contents();
     ob_clean();
     
-    include APP_PATH . $this->layout;
-    $site = ob_get_contents();
+    if (file_exists($this->layout)) {
+      include $this->layout;
+      $site = ob_get_contents();
+    } else {  
+      $site = $content;
+    }
     ob_end_clean();
 
     return $site;
