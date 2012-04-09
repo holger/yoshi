@@ -6,39 +6,44 @@ class Application {
   
   private $routes = array();
   private $config = array(
-    'BASE_PATH' => '' 
+    'BASE_PATH' => ''
   );
   
   public function __construct($config = array()) {
     $this->config = array_merge($this->config, $config);
   }
   
-  public function get($path, $callback) {
-    $this->addRoute('GET', $path, $callback);
+  public function get($path, $callback, $callback_method = null) {
+    return $this->addRoute('GET', $path, $callback, $callback_method);
   }
   
-  public function post($path, $callback) {
-    $this->addRoute('POST', $path, $callback);
+  public function post($path, $callback, $callback_method = null) {
+    return $this->addRoute('POST', $path, $callback, $callback_method);
   }
   
-  public function put($path, $callback) {
-    $this->addRoute('PUT', $path, $callback);
+  public function put($path, $callback, $callback_method = null) {
+    return $this->addRoute('PUT', $path, $callback, $callback_method);
   }
   
-  public function delete($path, $callback) {
-    $this->addRoute('DELETE', $path, $callback);
+  public function delete($path, $callback, $callback_method = null) {
+    return $this->addRoute('DELETE', $path, $callback, $callback_method);
   }
   
-  public function head($path, $callback) {
-    $this->addRoute('HEAD', $path, $callback);
+  public function head($path, $callback, $callback_method = null) {
+    return $this->addRoute('HEAD', $path, $callback, $callback_method);
   }
   
-  public function options($path, $callback) {
-    $this->addRoute('OPTIONS', $path, $callback);
+  public function options($path, $callback, $callback_method = null) {
+    return $this->addRoute('OPTIONS', $path, $callback, $callback_method);
   }
   
-  private function addRoute($method, $path, $callback) {
-    $this->routes[] = new Route($method, $path, $callback);
+  private function addRoute($method, $path, $callback, $callback_method) {
+    if ($callback_method !== null) {
+      $callback = array($callback, $callback_method);
+    }
+    $route = new Route($method, $path, $callback);
+    $this->routes[] = $route;
+    return $route;
   }
   
   public function run(Request $request = null) {
