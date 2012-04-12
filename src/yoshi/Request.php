@@ -9,9 +9,10 @@ class Request {
   private $request_method;
   private $script_name;
 
-  public static function create($uri, $method = 'GET') {
+  public static function create($uri, $script_name = null, $method = 'GET') {
     $request = new Request();
     $request->setRequestUri($uri);
+    $request->script_name = $script_name;
     $request->request_method = $method;
     return $request;
   }
@@ -31,7 +32,10 @@ class Request {
   }
   
   public function getRootUri() {
-    $base_uri = strpos($this->requestUri, $this->script_name) === 0 ? $this->script_name : str_replace('\\', '/', dirname($this->script_name));
+    if ($this->script_name == null) {
+      return '';
+    }
+    $base_uri = strpos($this->request_uri, $this->script_name) === 0 ? $this->script_name : str_replace('\\', '/', dirname($this->script_name));
     return rtrim($base_uri, '/');
   }
   

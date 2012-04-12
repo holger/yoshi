@@ -5,23 +5,17 @@ namespace yoshi;
 use Exception;
 
 class Views {
-  
+
   private $config = array(
-    'WEBROOT' => '',
     'TEMPLATES_PATH' => 'app/views/',
     'LAYOUTS_PATH' => 'layouts/', 
     'DEFAULT_LAYOUT' => 'application.php'
   );
   
-  private $application_helpers;
+  private $application_helpers = array();
   
   public function __construct($config) {
     $this->config = array_merge($this->config, $config);
-    
-    $config = $this->config;
-    $this->helper('link', function($view) use ($config) {
-      return $config['WEBROOT'] . $view;
-    });
   }
   
   public function create($template, $layout = null) {

@@ -4,6 +4,7 @@ namespace yoshi;
 
 class Route {
   
+  private $name;
   private $method;
   private $path;
   private $compiled_path;
@@ -19,8 +20,32 @@ class Route {
     $this->callback = $callback;
   }
   
-  public function matches(Request $request) {
+  private function matchesPath($path) {
+    return preg_match($this->compiled_path, $this->method . '#' . $path) > 0;
+  }
+  
+  private function matchesName($name) {
+    return $this->name == $name;
+  }
+  
+  private function matchesRequest(Request $request) {
     return count($this->_matches($request)) > 0;
+  }
+  
+  public function matches($search) {
+    if ($search instanceof Request) {
+      return $this->matchesRequest($search);
+    }
+    
+    return $this->matchesName($search) or $this->matchesPath($search);
+  }
+
+  private function _matches(Request $request) {
+    $path = str_replace($request->getRootUri(), '', $request->getRequestUriPath());
+    $method = $request->getRequestMethod();
+
+    preg_match($this->compiled_path, $method . '#' . $path, $matches);
+    return $matches;
   }
   
   public function execute(Request $request) {
@@ -30,12 +55,20 @@ class Route {
     }
   }
   
-  private function _matches(Request $request) {
-    $path = str_replace($request->getRootUri(), '', $request->getRequestUriPath());
-    $method = $request->getRequestMethod();
+  public function link(Request $request, $params = array()) {
+    if (!is_array($params)) {
+      $params = array($params);
+    }
+    
+    $path = preg_replace_callback('/[{][^}]*[}]/', function($matches) use (&$params) {
+      return array_shift($params);
+    }, $this->path);
+    
+    return $request->getRootUri() . $path;
+  }
   
-    preg_match($this->compiled_path, $method . '#' . $path, $matches);
-    return $matches;
+  public function named($name) {
+    $this->name = $name;
   }
 
 }

@@ -51,6 +51,10 @@ class Application {
     }
   }
   
+  public function routes() {
+    return $this->routes;
+  }
+  
 }
 
 ?>
