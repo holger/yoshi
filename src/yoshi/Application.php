@@ -49,10 +49,8 @@ class Application {
         return $route->execute($request);
       }
     }
-  }
-  
-  public function routes() {
-    return $this->routes;
+    
+    echo 'No route found';
   }
   
 }

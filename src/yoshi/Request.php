@@ -11,16 +11,16 @@ class Request {
 
   public static function create($uri, $script_name = null, $method = 'GET') {
     $request = new Request();
+    $request->request_method = $method;
     $request->setRequestUri($uri);
     $request->script_name = $script_name;
-    $request->request_method = $method;
     return $request;
   }
   
   public static function createFromGlobals() {
     $request = new Request();
-    $request->setRequestUri($_SERVER['REQUEST_URI']);
     $request->request_method = $_SERVER['REQUEST_METHOD'];
+    $request->setRequestUri($_SERVER['REQUEST_URI']);
     $request->script_name = $_SERVER['SCRIPT_NAME'];
     return $request;
   }

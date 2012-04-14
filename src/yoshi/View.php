@@ -33,6 +33,8 @@ class View {
     $helper = $this->helpers[$name];
     
     if ($helper != null) {
+      $request = Request::createFromGlobals();
+      array_push($arguments, $request);
       return call_user_func_array($helper, $arguments);
     }
   }

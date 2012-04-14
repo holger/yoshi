@@ -4,7 +4,6 @@ namespace yoshi;
 
 class Route {
   
-  private $name;
   private $method;
   private $path;
   private $compiled_path;
@@ -19,56 +18,36 @@ class Route {
     $this->method = $method;
     $this->callback = $callback;
   }
-  
-  private function matchesPath($path) {
-    return preg_match($this->compiled_path, $this->method . '#' . $path) > 0;
-  }
-  
-  private function matchesName($name) {
-    return $this->name == $name;
-  }
-  
-  private function matchesRequest(Request $request) {
-    return count($this->_matches($request)) > 0;
-  }
-  
-  public function matches($search) {
-    if ($search instanceof Request) {
-      return $this->matchesRequest($search);
-    }
-    
-    return $this->matchesName($search) or $this->matchesPath($search);
-  }
 
-  private function _matches(Request $request) {
-    $path = str_replace($request->getRootUri(), '', $request->getRequestUriPath());
-    $method = $request->getRequestMethod();
-
-    preg_match($this->compiled_path, $method . '#' . $path, $matches);
-    return $matches;
-  }
-  
   public function execute(Request $request) {
-    if (count($matches = $this->_matches($request)) > 0) {
+    if (count($matches = $this->_matchesRequest($request)) > 0) {
       array_shift($matches);
       return call_user_func_array($this->callback, $matches);
     }
   }
   
-  public function link(Request $request, $params = array()) {
-    if (!is_array($params)) {
-      $params = array($params);
+  public function matches($request_or_path) {
+    if ($request_or_path instanceof Request) {
+      return $this->matchesRequest($request_or_path);
     }
     
-    $path = preg_replace_callback('/[{][^}]*[}]/', function($matches) use (&$params) {
-      return array_shift($params);
-    }, $this->path);
-    
-    return $request->getRootUri() . $path;
+    return $this->matchesPath($request_or_path);
   }
-  
-  public function named($name) {
-    $this->name = $name;
+
+  private function matchesPath($path) {
+    return preg_match($this->compiled_path, $this->method . '#' . $path) > 0;
+  }
+
+  private function matchesRequest(Request $request) {
+    return count($this->_matchesRequest($request)) > 0;
+  }
+
+  private function _matchesRequest(Request $request) {
+    $path = str_replace($request->getRootUri(), '', $request->getRequestUriPath());
+    $method = $request->getRequestMethod();
+
+    preg_match($this->compiled_path, $method . '#' . $path, $matches);
+    return $matches;
   }
 
 }

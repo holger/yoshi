@@ -5,54 +5,20 @@ namespace yoshi;
 class UrlHelperTest extends \PHPUnit_Framework_TestCase
 {
   
-  public function testLinkShouldReturnLinkForPaths() {
-    $app = new Application();
-    $app->get('/test', function() {});
-    $request = Request::create('/test');
-    
-    $helper = new UrlHelper($app->routes());
-    
-    $this->assertEquals('/test', $helper->link($request, '/test'));
-  }
-  
-  public function testLinkShouldReturnLinkForPathsIncludingWebroot() {
-    $app = new Application();
-    $app->get('/test', function() {});
+  public function testLinkShouldAddWebrootFromRequest() {
+    $helper = new UrlHelper();
     $request = Request::create('/webroot/test', '/webroot');
-
-    $helper = new UrlHelper($app->routes());
-
-    $this->assertEquals('/webroot/test', $helper->link($request, '/test'));
+    
+    $this->assertEquals('/webroot/page', $helper->link('/page', $request));
   }
   
-  public function testLinkShouldReturnLinkForNamedRoutes() {
-    $app = new Application();
-    $app->get('/test', function() {})->named('root');
-    $request = Request::create('/test');
+  public function testLinkShouldCreateRequestFormGlobalsWhenNoRequestIsGiven() {
+    $helper = new UrlHelper();
+    $_SERVER['REQUEST_URI'] = '/webroot/test';
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_SERVER['SCRIPT_NAME'] = '/webroot';
     
-    $helper = new UrlHelper($app->routes());
-    
-    $this->assertEquals('/test', $helper->link($request, 'root'));
-  }
-
-  public function testLinkShouldReturnLinkForNamedRoutesIncludingWebroot() {
-    $app = new Application();
-    $app->get('/test', function() {})->named('root');
-    $request = Request::create('/webroot/test', '/webroot');
-
-    $helper = new UrlHelper($app->routes());
-
-    $this->assertEquals('/webroot/test', $helper->link($request, 'root'));
-  }
-  
-  public function testLinkShouldReturnLinkForNamedRoutesWithParameters() {
-    $app = new Application();
-    $app->get('/test/{id}', function($id) {})->named('root');
-    $request = Request::create('/test');
-    
-    $helper = new UrlHelper($app->routes());
-    
-    $this->assertEquals('/test/12345', $helper->link($request, 'root', 12345));
+    $this->assertEquals('/webroot/page', $helper->link('/page'));
   }
 
 }

@@ -4,19 +4,11 @@ namespace yoshi;
 
 class UrlHelper {
   
-  private $routes = array();
-  
-  public function __construct($routes) {
-    $this->routes = $routes;
-  }
-  
-  public function link(Request $request, $name, $params = array()) {
-    foreach ($this->routes as $route) {
-      if ($route->matches($name)) {
-        return $route->link($request, $params);
-      }
+  public function link($path, Request $request = null) {
+    if ($request === null) {
+      $request = Request::createFromGlobals();
     }
-    return '';
+    return $request->getRootUri() . $path;
   }
   
 }
