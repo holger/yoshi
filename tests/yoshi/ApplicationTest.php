@@ -24,8 +24,13 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
   }
   
   private function assertRoute($expected, $app, $uri, $method = 'get') {
-    $result = $app->run(Request::create($uri, '', $method));
+    ob_start();
+    $app->run(Request::create($uri, '', $method));
+    $result = ob_get_contents();
+    ob_end_clean();
     $this->assertEquals($expected, $result);
   }
     
 }
+
+?>

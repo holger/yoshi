@@ -4,39 +4,34 @@ namespace yoshi;
 
 class Application {
   
-  private $routes = array();
+  private $router;
+  
+  public function __construct() {
+    $this->router = new Router();
+  }
   
   public function get($path, $callback, $callback_method = null) {
-    return $this->addRoute('GET', $path, $callback, $callback_method);
+    $this->router->get($path, $callback, $callback_method);
   }
   
   public function post($path, $callback, $callback_method = null) {
-    return $this->addRoute('POST', $path, $callback, $callback_method);
+    $this->router->post($path, $callback, $callback_method);
   }
   
   public function put($path, $callback, $callback_method = null) {
-    return $this->addRoute('PUT', $path, $callback, $callback_method);
+    $this->router->put($path, $callback, $callback_method);
   }
   
   public function delete($path, $callback, $callback_method = null) {
-    return $this->addRoute('DELETE', $path, $callback, $callback_method);
+    $this->router->delete($path, $callback, $callback_method);
   }
   
   public function head($path, $callback, $callback_method = null) {
-    return $this->addRoute('HEAD', $path, $callback, $callback_method);
+    $this->router->head($path, $callback, $callback_method);
   }
   
   public function options($path, $callback, $callback_method = null) {
-    return $this->addRoute('OPTIONS', $path, $callback, $callback_method);
-  }
-  
-  private function addRoute($method, $path, $callback, $callback_method) {
-    if ($callback_method !== null) {
-      $callback = array($callback, $callback_method);
-    }
-    $route = new Route($method, $path, $callback);
-    $this->routes[] = $route;
-    return $route;
+    $this->router->options($path, $callback, $callback_method);
   }
   
   public function run(Request $request = null) {
@@ -44,13 +39,8 @@ class Application {
       $request = Request::createFromGlobals();
     }
     
-    foreach ($this->routes as $route) {
-      if ($route->matches($request)) {
-        return $route->execute($request);
-      }
-    }
-    
-    echo 'No route found';
+    $response = $this->router->handle($request);
+    $response->send();
   }
   
 }
