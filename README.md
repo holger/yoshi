@@ -15,7 +15,13 @@ $app->run();
 ?>
 ```
 
-Yoshi works with PHP 5.3.2 or later.
+Features
+--------
+
+* HTTP Routing (supported methods: GET, POST, UPDATE, DELETE, HEAD & OPTIONS)
+* Views & View Helpers (only UrlHelper included right now)
+* Custom Error Views
+
 
 [1]: http://silex.sensiolabs.org/
 [2]: http://www.slimframework.com/
