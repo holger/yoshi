@@ -50,6 +50,17 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals('405 Method Not Allowed', $response->status());
     $this->assertContains('Allow: GET, PUT', $response->headers(), 'No header \'Allow: GET, PUT\' in ' . print_r($response->headers(), true));
   }
+  
+  public function testErrorShouldAssociateCallbackForHttpErrors() {
+    $app = new Application();
+    $app->error(function() { return 'Error callback'; });
+    
+    $response = new ResponseMock();
+    $app->run(Request::create('/unknown-route'), $response);
+    
+    $this->assertEquals('404 Not Found', $response->status());
+    $this->assertEquals('Error callback', $response->contents());
+  }
     
 }
 

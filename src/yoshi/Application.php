@@ -8,6 +8,7 @@ use yoshi\exceptions\MethodNotAllowedException;
 class Application {
   
   private $router;
+  private $error_callback;
   
   public function __construct() {
     $this->router = new Router();
@@ -37,18 +38,33 @@ class Application {
     $this->router->options($path, $callback, $callback_method);
   }
   
+  public function error($callback, $callback_method = null) {
+    if ($callback_method !== null) {
+      $callback = array($callback, $callback_method);
+    }
+    $this->error_callback = $callback;
+  }
+  
   public function run(Request $request = null, Response $response = null) {
     $request = $request == null ? Request::createFromGlobals() : $request;
     $response = $response == null ? new Response() : $response;
     $result;
+    $error = false;
     
     try {
       $response->setContents($this->router->handle($request));
     } catch (NotFoundException $e) {
       $response->setStatus(404);
+      $error = true;
     } catch (MethodNotAllowedException $e) {
       $response->setStatus(405);
       $response->header('Allow: ' . $e->allowedMethods());
+      $error = true;
+    }
+    
+    if ($error && $this->error_callback !== null) {
+      $contents = call_user_func($this->error_callback);
+      $response->setContents($contents);
     }
     
     $response->send();
