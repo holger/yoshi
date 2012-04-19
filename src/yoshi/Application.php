@@ -2,6 +2,9 @@
 
 namespace yoshi;
 
+use yoshi\exceptions\NotFoundException;
+use yoshi\exceptions\MethodNotAllowedException;
+
 class Application {
   
   private $router;
@@ -34,12 +37,20 @@ class Application {
     $this->router->options($path, $callback, $callback_method);
   }
   
-  public function run(Request $request = null) {
-    if ($request === null) {
-      $request = Request::createFromGlobals();
+  public function run(Request $request = null, Response $response = null) {
+    $request = $request == null ? Request::createFromGlobals() : $request;
+    $response = $response == null ? new Response() : $response;
+    $result;
+    
+    try {
+      $response->setContents($this->router->handle($request));
+    } catch (NotFoundException $e) {
+      $response->setStatus(404);
+    } catch (MethodNotAllowedException $e) {
+      $response->setStatus(405);
+      $response->header('Allow: ' . $e->allowedMethods());
     }
     
-    $response = $this->router->handle($request);
     $response->send();
   }
   

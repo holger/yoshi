@@ -2,6 +2,9 @@
 
 namespace yoshi;
 
+use yoshi\exceptions\NotFoundException;
+use yoshi\exceptions\MethodNotAllowedException;
+
 class RouterTest extends \PHPUnit_Framework_TestCase {
   
   public function testGetShouldAddARouteForHttpGet() {
@@ -65,51 +68,57 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     $this->assertTrue($routes[0]->matches(Request::create($path, null, $http_method)));
   }
   
-  public function testHandleShouldReturnResponse() {
-    $router = new Router();
-    $router->get('/test', function() {});
-    $request = Request::create('/test');
-    
-    $response = $router->handle($request);
-    
-    $this->assertNotNull($response);
-    $this->assertTrue($response instanceof Response, 'handleRequest should return an instance of Response');
-  }
-  
-  public function testHandleShouldExecuteMatchingRouteForRequest() {
+  public function testHandleShouldReturnCallbackResponseForMatchingRoute() {
     $router = new Router();
     $router->get('/test', function() { return 'GET /test called'; });
     $request = Request::create('/test');
 
     $response = $router->handle($request);
     
-    $this->assertNotNull($response);
-    $this->assertTrue($response instanceof Response, 'handleRequest should return an instance of Response');
-    $this->assertEquals('GET /test called', $response->contents());
+    $this->assertEquals('GET /test called', $response);
   }
   
-  public function testHandleShouldReturnAHttpError404ForUnknownRequests() {
+  public function testHandleShouldThrowANotFoundExceptionForUnknownRequests() {
     $router = new Router();
     $router->get('/test', function() {});
     $request = Request::create('/unknown-route');
     
-    $response = $router->handle($request);
+    try {
+      $response = $router->handle($request);
+    } catch(NotFoundException $e) {
+      return;
+    }
     
-    $this->assertNotNull($response);
-    $this->assertTrue($response instanceof Response, 'handleRequest should return an instance of Response');
-    $this->assertEquals('404 Not Found', $response->status());
+    $this->fail('handle should throw exceptions for unknown routes');
   }
   
-  public function testHandleShouldReturnAHttpError403ForRequestWithAnUnsupportedHttpMethod() {
+  public function testHandleShouldThrowAMethodNotAllowedExceptionForRequestWithAnUnsupportedHttpMethod() {
     $router = new Router();
     $router->get('/test', function() {});
     $request = Request::create('/test', null, 'POST');
     
-    $response = $router->handle($request);
+    try {
+      $response = $router->handle($request);
+    } catch (MethodNotAllowedException $e) {
+      return;
+    }
     
-    $this->assertNotNull($response);
-    $this->assertTrue($response instanceof Response, 'handleRequest should return an instance of Response');
-    $this->assertEquals('405 Method Not Allowed', $response->status());
+    $this->fail('handle should throw a MethodNotAllowedException when a route would match for a diffrent method');
+  }
+  
+  public function testHandleShouldAddAllowedMethodsForThrownMethodNotAllowedException() {
+    $router = new Router();
+    $router->get('/test', function() {});
+    $request = Request::create('/test', null, 'POST');
+    
+    try {
+      $response = $router->handle($request);
+    } catch (MethodNotAllowedException $e) {
+      $this->assertEquals('GET', $e->allowedMethods());
+      return;
+    }
+    
+    $this->fail('handle should throw a MethodNotAllowedException when a route would match for a diffrent method');
   }
   
 }

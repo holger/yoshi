@@ -50,6 +50,10 @@ class Request {
   public function getRequestMethod() {
     return $this->request_method;
   }
+  
+  public function __toString() {
+    return sprintf('%s %s', $this->request_method, $this->request_uri);
+  }
 
 }
 

@@ -49,5 +49,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     
     $this->assertEquals('/webroot', $request->getRootUri());
   }
+  
+  public function testToStringShouldReturnMethodAndUri() {
+    $request = Request::create('/test?url=1234');
+    
+    $this->assertEquals('GET /test?url=1234', (string)$request);
+  }
     
 }

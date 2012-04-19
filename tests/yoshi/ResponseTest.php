@@ -19,6 +19,31 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     ob_end_clean();
     return $contents;
   }
+  
+  public function testStatusShouldConcatStatusCodeAndReasonPhrase() {
+    $response = new Response();
+    $response->setStatus(404, 'Nothing Found');
+    
+    $this->assertEquals('404 Nothing Found', $response->status());
+  }
+  
+  public function testStatusShouldUsePredefinedReasonPhrasesForMatchingStatusCodes() {
+    $response = new Response();
+    
+    $response->setStatus(404);
+    $this->assertEquals('404 Not Found', $response->status());
+    
+    $response->setStatus(405);
+    $this->assertEquals('405 Method Not Allowed', $response->status());
+  }
+  
+  public function testAddHeaderShouldAddHeaderToHeadersList() {
+    $response = new Response();
+    
+    $response->header('some header');
+    
+    $this->assertContains('some header', $response->headers());
+  }
     
 }
 

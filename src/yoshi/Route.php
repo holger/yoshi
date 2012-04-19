@@ -59,6 +59,10 @@ class Route {
     }
     return $matches;
   }
+  
+  public function method() {
+    return $this->method;
+  }
 
 }
 

@@ -20,7 +20,6 @@ Yoshi works with PHP 5.3.2 or later.
 Feature Requests
 ----------------
 
-* HTTP error for non existing routes or wrong HTTP methods
 * Custom error pages
 
 [1]: http://silex.sensiolabs.org/

@@ -2,6 +2,9 @@
 
 namespace yoshi;
 
+use yoshi\exceptions\NotFoundException;
+use yoshi\exceptions\MethodNotAllowedException;
+
 class Router {
   
   private $routes = array();
@@ -46,21 +49,22 @@ class Router {
   public function handle(Request $request) {
     $response = new Response();
     $matches_without_http_method = false;
+    $allowed_methods = array();
     
     foreach ($this->routes as $route) {
       if ($route->matches($request)) {
-        $response->setContents($route->execute($request));
-        return $response;
+        return $route->execute($request);
       }
       if ($route->matchesWithoutHttpMethod($request)) {
         $matches_without_http_method = true;
+        $allowed_methods[] = $route->method();
       }
     }
     
     if ($matches_without_http_method) {
-      $response->setStatus('405 Method Not Allowed');
+      throw new MethodNotAllowedException($allowed_methods);
     } else {
-      $response->setStatus('404 Not Found'); 
+      throw new NotFoundException('Unable to find a route for ' . $request);
     }
     return $response;
   }
