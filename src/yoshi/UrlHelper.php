@@ -8,7 +8,7 @@ class UrlHelper {
     if ($request === null) {
       $request = Request::createFromGlobals();
     }
-    return $request->rootUri() . $path;
+    return $request->rootUri() . '/' . ltrim($path, '/');
   }
   
 }
