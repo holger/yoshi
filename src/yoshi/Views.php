@@ -41,9 +41,12 @@ class Views {
     return $view->render();
   }
   
-  public function helper($name, $callback) {
+  public function helper($name, $callback, $callback_method = null) {
     if (method_exists('yoshi\View', $name)) {
       throw new Exception(sprintf('Can\'t use helper with the name %s, since this name is already used as a method name inside of the View class.', $name));
+    }
+    if ($callback_method !== null) {
+      $callback = array($callback, $callback_method);
     }
     $this->application_helpers[$name] = $callback;
     return $this;
