@@ -14,24 +14,22 @@ class Response {
     '405' => 'Method Not Allowed'
   );
   
-  public function setContents($contents) {
-    $this->contents = $contents;
-  }
-  
-  public function contents() {
+  public function contents($contents = null) {
+    if ($contents !== null) {
+      $this->contents = $contents;
+    }
     return $this->contents;
   }
   
-  public function setStatus($status_code, $reason_phrase = '') {
-    $this->status_code = $status_code;
-    if ($reason_phrase === '') {
-      $reason_phrase = self::$reason_phrases[$status_code];
+  public function status($status_code = null, $reason_phrase = null) {
+    if ($status_code !== null) {
+      $this->status_code = $status_code; 
+      if ($reason_phrase === null) {
+        $reason_phrase = self::$reason_phrases[$status_code];
+      }
+      $this->reason_phrase = $reason_phrase;
     }
-    $this->reason_phrase = $reason_phrase;
     
-  }
-  
-  public function status() {
     $status = $this->status_code;
     if (!empty($this->reason_phrase)) {
       $status .= ' ' . $this->reason_phrase;

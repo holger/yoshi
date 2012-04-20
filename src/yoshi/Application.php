@@ -52,19 +52,19 @@ class Application {
     $error = false;
     
     try {
-      $response->setContents($this->router->handle($request));
+      $response->contents($this->router->handle($request));
     } catch (NotFoundException $e) {
-      $response->setStatus(404);
+      $response->status(404);
       $error = true;
     } catch (MethodNotAllowedException $e) {
-      $response->setStatus(405);
+      $response->status(405);
       $response->header('Allow: ' . $e->allowedMethods());
       $error = true;
     }
     
     if ($error && $this->error_callback !== null) {
       $contents = call_user_func($this->error_callback);
-      $response->setContents($contents);
+      $response->contents($contents);
     }
     
     $response->send();

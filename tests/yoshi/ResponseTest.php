@@ -7,7 +7,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
   
   public function testSendShouldEchoContents() {
     $response = new Response();
-    $response->setContents('Test Content');
+    $response->contents('Test Content');
     
     $this->assertEquals('Test Content', $this->result($response));
   }
@@ -22,7 +22,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
   
   public function testStatusShouldConcatStatusCodeAndReasonPhrase() {
     $response = new Response();
-    $response->setStatus(404, 'Nothing Found');
+    $response->status(404, 'Nothing Found');
     
     $this->assertEquals('404 Nothing Found', $response->status());
   }
@@ -30,10 +30,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
   public function testStatusShouldUsePredefinedReasonPhrasesForMatchingStatusCodes() {
     $response = new Response();
     
-    $response->setStatus(404);
+    $response->status(404);
     $this->assertEquals('404 Not Found', $response->status());
     
-    $response->setStatus(405);
+    $response->status(405);
     $this->assertEquals('405 Method Not Allowed', $response->status());
   }
   
