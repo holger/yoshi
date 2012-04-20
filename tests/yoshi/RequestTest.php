@@ -7,14 +7,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
   
   public function testRequestPartShouldBeSplittedFromRequestUri() {
     $request = Request::create('/test?url=1234');
-    $this->assertEquals('GET', $request->getRequestMethod());
-    $this->assertEquals('/test?url=1234', $request->getRequestUri());
-    $this->assertEquals('/test', $request->getRequestUriPath());
+    $this->assertEquals('GET', $request->method());
+    $this->assertEquals('/test?url=1234', $request->uri());
+    $this->assertEquals('/test', $request->uriPath());
     
     $request = Request::create('http://www.test.de/test?url=1234');
-    $this->assertEquals('GET', $request->getRequestMethod());
-    $this->assertEquals('http://www.test.de/test?url=1234', $request->getRequestUri());
-    $this->assertEquals('/test', $request->getRequestUriPath());
+    $this->assertEquals('GET', $request->method());
+    $this->assertEquals('http://www.test.de/test?url=1234', $request->uri());
+    $this->assertEquals('/test', $request->uriPath());
   }
   
   public function testCreateFromGlobalsShouldUseServerVariables() {
@@ -22,23 +22,23 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $request = Request::createFromGlobals();
     
-    $this->assertEquals('GET', $request->getRequestMethod());
-    $this->assertEquals('/test?url=1234', $request->getRequestUri());
-    $this->assertEquals('/test', $request->getRequestUriPath());
+    $this->assertEquals('GET', $request->method());
+    $this->assertEquals('/test?url=1234', $request->uri());
+    $this->assertEquals('/test', $request->uriPath());
   
     $_SERVER['REQUEST_URI'] = 'http://www.test.de/test?url=1234';
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $request = Request::createFromGlobals();
 
-    $this->assertEquals('GET', $request->getRequestMethod());
-    $this->assertEquals('http://www.test.de/test?url=1234', $request->getRequestUri());
-    $this->assertEquals('/test', $request->getRequestUriPath());
+    $this->assertEquals('GET', $request->method());
+    $this->assertEquals('http://www.test.de/test?url=1234', $request->uri());
+    $this->assertEquals('/test', $request->uriPath());
   }
   
   public function testCreateWithScriptNameShouldSetRootUri() {
     $request = Request::create('/webroot/test', '/webroot');
     
-    $this->assertEquals('/webroot', $request->getRootUri());
+    $this->assertEquals('/webroot', $request->rootUri());
   }
   
   public function testCreateFormGlobalsWithScriptNameShouldSetRootUri() {
@@ -47,7 +47,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     $_SERVER['SCRIPT_NAME'] = '/webroot';
     $request = Request::createFromGlobals();
     
-    $this->assertEquals('/webroot', $request->getRootUri());
+    $this->assertEquals('/webroot', $request->rootUri());
   }
   
   public function testToStringShouldReturnMethodAndUri() {

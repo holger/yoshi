@@ -49,8 +49,8 @@ class Route {
   }
 
   private function _matchesRequest(Request $request, $include_http_method = true) {
-    $path = str_replace($request->getRootUri(), '', $request->getRequestUriPath());
-    $method = $request->getRequestMethod();
+    $path = str_replace($request->rootUri(), '', $request->uriPath());
+    $method = $request->method();
 
     if ($include_http_method) {
       preg_match($this->compiled_path, $method . '#' . $path, $matches);
