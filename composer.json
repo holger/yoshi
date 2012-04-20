@@ -1,11 +1,11 @@
 {
   "name": "holger/yoshi",
   "description": "A PHP micro-framework",
-  "homepage": "http://rueprich.de/yoshi",
+  "homepage": "https://github.com/holger/yoshi",
   "keywords": ["microframework"],
   "type": "library",
   "version": "0.1.0",
-  "license": "BSD",
+  "license": "MIT",
   "require": {
     "php": ">=5.3.0"
   },
