@@ -22,33 +22,13 @@ class Route {
   }
 
   public function execute(Request $request) {
-    if (count($matches = $this->_matchesRequest($request)) > 0) {
+    if ($this->matches($request, true, $matches)) {
       array_shift($matches);
       return call_user_func_array($this->callback, $matches);
     }
   }
-  
-  public function matches($request_or_path, $include_http_method = true) {
-    if ($request_or_path instanceof Request) {
-      return $this->matchesRequest($request_or_path, $include_http_method);
-    }
-    
-    return $this->matchesPath($request_or_path);
-  }
-  
-  public function matchesWithoutHttpMethod($request_or_path) {
-    return $this->matches($request_or_path, false);
-  }
 
-  private function matchesPath($path) {
-    return preg_match($this->compiled_path, $this->method . '#' . $path) > 0;
-  }
-
-  private function matchesRequest(Request $request, $include_http_method) {
-    return count($this->_matchesRequest($request, $include_http_method)) > 0;
-  }
-
-  private function _matchesRequest(Request $request, $include_http_method = true) {
+  public function matches(Request $request, $include_http_method = true, &$matches = null) {
     $path = str_replace($request->rootUri(), '', $request->uriPath());
     $method = $request->method();
 
@@ -57,7 +37,11 @@ class Route {
     } else {
       preg_match($this->compiled_path_without_http_method, $path, $matches);
     }
-    return $matches;
+    return count($matches) > 0;
+  }
+
+  public function matchesWithoutHttpMethod(Request $request) {
+    return $this->matches($request, false);
   }
   
   public function method() {

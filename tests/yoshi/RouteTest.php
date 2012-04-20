@@ -63,17 +63,6 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals(null, $route->execute($request));
   }
   
-  public function testMatchesPathShouldReturnTrueForMatchingPaths() {
-    $route = new Route('GET', '/test', function() {});
-    $this->assertTrue($route->matches('/test'));
-    $this->assertFalse($route->matches('/testt'));
-  }
-  
-  public function testMatchesPathShouldReturnTrueForMatchingPathsAndParameters() {
-    $route = new Route('GET', '/test/{id}', function($id) {});
-    $this->assertTrue($route->matches('/test/1234'));
-  }
-  
   public function testMatchesWithoutHttpMethodShouldReturnTrueForMatchingPaths() {
     $route = new Route('GET', '/test', function() {});
     $request = Request::create('/test', null, 'POST');
