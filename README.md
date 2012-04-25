@@ -16,6 +16,7 @@ $app->run();
 
 Yoshi requires PHP 5.3.
 
+
 ## Features
 
 * HTTP Routing (supported methods: GET, POST, UPDATE, DELETE, HEAD & OPTIONS)
@@ -23,12 +24,14 @@ Yoshi requires PHP 5.3.
 * Custom Error Views
 * Application & Route Filters
 
+
 ## Open Issues
 
 * Redirects
 * Authentication Helper
 
-## Similar micro frameworks
+
+## Similar PHP micro frameworks
 
  * [Silex][1]
  * [Slim][2]
@@ -39,9 +42,10 @@ Yoshi requires PHP 5.3.
  * [Flight][7]
  * [Epiphany][8]
 
+
 ## License
 
-Yoshi is released under the MIT License.
+Yoshi is released under the [MIT License](LICENSE).
 
 
 [1]: http://silex.sensiolabs.org/
