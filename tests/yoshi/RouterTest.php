@@ -126,6 +126,36 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     $this->fail('handle should throw a MethodNotAllowedException when a route would match for a diffrent method');
   }
   
+  public function testRouterFiltersShouldBeExcecutedBeforeAnyRouteExecution() {
+    $router = new Router();
+    $router->before(function() { return 'before1'; })
+           ->before(function() { return 'before2'; })
+           ->after(function() { return 'after1'; })
+           ->after(function() { return 'after2'; });
+    
+    $router->get('/test', function() { return 'test'; });
+    $router->get('/foo', function() { return 'foo'; });
+    
+    $response = $router->handle(Request::create('/test'));
+    $this->assertEquals('before1before2testafter1after2', $response);
+    
+    $response = $router->handle(Request::create('/foo'));
+    $this->assertEquals('before1before2fooafter1after2', $response);
+  }
+  
+  public function testRouterFiltersShouldBeExcecutedArroundRouteFilters() {
+    $router = new Router();
+    $router->before(function() { return 'before_router'; })
+           ->after(function() { return 'after_router'; });
+    
+    $router->get('/test', function() { return 'test'; })
+           ->before(function() { return 'before_route'; })
+           ->after(function() { return 'after_route'; });
+    
+    $response = $router->handle(Request::create('/test'));
+    $this->assertEquals('before_routerbefore_routetestafter_routeafter_router', $response);
+  }
+  
 }
 
 ?>

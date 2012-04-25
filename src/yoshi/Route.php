@@ -14,6 +14,8 @@ class Route {
   private $compiled_path;
   private $compiled_path_without_http_method;
   private $callback;
+  private $before_filters = array();
+  private $after_filters = array();
   
   public function __construct($method, $path, $callback) {
     $path_pattern = str_replace('/', '\/', $path);
@@ -27,10 +29,22 @@ class Route {
   }
 
   public function execute(Request $request) {
+    $result = '';
+    
+    foreach ($this->before_filters as $filter) {
+      $result .= call_user_func($filter);
+    }
+    
     if ($this->matches($request, true, $matches)) {
       array_shift($matches);
-      return call_user_func_array($this->callback, $matches);
+      $result .= call_user_func_array($this->callback, $matches);
     }
+    
+    foreach ($this->after_filters as $filter) {
+      $result .= call_user_func($filter);
+    }
+    
+    return $result;
   }
 
   public function matches(Request $request, $include_http_method = true, &$matches = null) {
@@ -51,6 +65,22 @@ class Route {
   
   public function method() {
     return $this->method;
+  }
+  
+  public function before($callback, $callback_method = null) {
+    if ($callback_method !== null) {
+      $callback = array($callback, $callback_method);
+    }
+    $this->before_filters[] = $callback;
+    return $this;
+  }
+  
+  public function after($callback, $callback_method = null) {
+    if ($callback_method !== null) {
+      $callback = array($callback, $callback_method);
+    }
+    $this->after_filters[] = $callback;
+    return $this;
   }
 
 }

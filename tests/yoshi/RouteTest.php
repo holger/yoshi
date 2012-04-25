@@ -83,5 +83,25 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     $this->assertFalse($route->matches($request));
     $this->assertFalse($route->matchesWithoutHttpMethod($request));
   }
+  
+  public function testBeforeFilterShouldBeCalledBeforeCallbackGetsExecuted() {
+    $route = new Route('GET', '/test', function() { return 'callback'; });
+    $route->before(function() { return 'before1'; })
+          ->before(function() { return 'before2'; });
+    
+    $result = $route->execute(Request::create('/test'));
+    
+    $this->assertEquals('before1before2callback', $result);
+  }
+
+  public function testAfterFilterShouldBeCalledAfterCallbackGetsExecuted() {
+    $route = new Route('GET', '/test', function() { return 'callback'; });
+    $route->after(function() { return 'after1'; })
+          ->after(function() { return 'after2'; });
+
+    $result = $route->execute(Request::create('/test'));
+
+    $this->assertEquals('callbackafter1after2', $result);
+  }
     
 }

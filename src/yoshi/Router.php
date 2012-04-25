@@ -13,36 +13,40 @@ use yoshi\exceptions\MethodNotAllowedException;
 class Router {
   
   private $routes = array();
+  private $before_filters = array();
+  private $after_filters = array();
   
   public function get($path, $callback, $callback_method = null) {
-    $this->route('GET', $path, $callback, $callback_method);
+    return $this->route('GET', $path, $callback, $callback_method);
   }
   
   public function post($path, $callback, $callback_method = null) {
-    $this->route('POST', $path, $callback, $callback_method);
+    return $this->route('POST', $path, $callback, $callback_method);
   }
   
   public function put($path, $callback, $callback_method = null) {
-    $this->route('PUT', $path, $callback, $callback_method);
+    return $this->route('PUT', $path, $callback, $callback_method);
   }
   
   public function delete($path, $callback, $callback_method = null) {
-    $this->route('DELETE', $path, $callback, $callback_method);
+    return $this->route('DELETE', $path, $callback, $callback_method);
   }
   
   public function head($path, $callback, $callback_method = null) {
-    $this->route('HEAD', $path, $callback, $callback_method);
+    return $this->route('HEAD', $path, $callback, $callback_method);
   }
   
   public function options($path, $callback, $callback_method = null) {
-    $this->route('OPTIONS', $path, $callback, $callback_method);
+    return $this->route('OPTIONS', $path, $callback, $callback_method);
   }
   
   private function route($method, $path, $callback, $callback_method) {
     if ($callback_method !== null) {
       $callback = array($callback, $callback_method);
     }
-    $this->routes[] = new Route($method, $path, $callback);
+    $route = new Route($method, $path, $callback);
+    $this->routes[] = $route;
+    return $route;
   }
   
   public function routes() {
@@ -50,13 +54,12 @@ class Router {
   }
   
   public function handle(Request $request) {
-    $response = new Response();
     $matches_without_http_method = false;
     $allowed_methods = array();
     
     foreach ($this->routes as $route) {
       if ($route->matches($request)) {
-        return $route->execute($request);
+        return $this->execute($route, $request);
       }
       if ($route->matchesWithoutHttpMethod($request)) {
         $matches_without_http_method = true;
@@ -69,7 +72,39 @@ class Router {
     } else {
       throw new NotFoundException('Unable to find a route for ' . $request);
     }
-    return $response;
+    return '';
+  }
+  
+  private function execute(Route $route, Request $request) {
+    $result = '';
+    
+    foreach ($this->before_filters as $filter) {
+      $result .= call_user_func($filter);
+    }
+    
+    $result .= $route->execute($request);
+    
+    foreach ($this->after_filters as $filter) {
+      $result .= call_user_func($filter);
+    }
+    
+    return $result;
+  }
+  
+  public function before($callback, $callback_method = null) {
+    if ($callback_method !== null) {
+      $callback = array($callback, $callback_method);
+    }
+    $this->before_filters[] = $callback;
+    return $this;
+  }
+  
+  public function after($callback, $callback_method = null) {
+    if ($callback_method !== null) {
+      $callback = array($callback, $callback_method);
+    }
+    $this->after_filters[] = $callback;
+    return $this;
   }
   
 }
