@@ -39,6 +39,11 @@ Yoshi requires PHP 5.3.
  * [Flight][7]
  * [Epiphany][8]
 
+## License
+
+Yoshi is released under the MIT License.
+
+
 [1]: http://silex.sensiolabs.org/
 [2]: http://www.slimframework.com/
 [3]: http://limonade-php.github.com/
@@ -47,7 +52,3 @@ Yoshi requires PHP 5.3.
 [6]: http://gluephp.com/
 [7]: http://flightphp.com/
 [8]: https://github.com/jmathai/epiphany
-
-## License
-
-Yoshi is released under the MIT License.
