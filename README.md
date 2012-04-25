@@ -45,7 +45,7 @@ Yoshi requires PHP 5.3.
 
 ## License
 
-Yoshi is released under the [MIT License](LICENSE).
+Yoshi is released under the [MIT License](yoshi/LICENSE).
 
 
 [1]: http://silex.sensiolabs.org/
