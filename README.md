@@ -45,7 +45,7 @@ Yoshi requires PHP 5.3.
 
 ## License
 
-Yoshi is released under the [MIT License](yoshi/LICENSE).
+Yoshi is released under the [MIT License][license].
 
 
 [1]: http://silex.sensiolabs.org/
@@ -56,3 +56,4 @@ Yoshi is released under the [MIT License](yoshi/LICENSE).
 [6]: http://gluephp.com/
 [7]: http://flightphp.com/
 [8]: https://github.com/jmathai/epiphany
+[license]: https://github.com/holger/yoshi/blob/master/LICENSE
