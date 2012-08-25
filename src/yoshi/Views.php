@@ -12,14 +12,14 @@ use Exception;
 class Views {
 
   private $config = array(
-    'TEMPLATES_PATH' => 'app/views/',
+    'TEMPLATES_PATH' => 'views/',
     'LAYOUTS_PATH' => 'layouts/', 
     'DEFAULT_LAYOUT' => 'application.php'
   );
   
   private $application_helpers = array();
   
-  public function __construct($config) {
+  public function __construct($config = array()) {
     $this->config = array_merge($this->config, $config);
   }
   
