@@ -7,7 +7,7 @@ A PHP micro-framework.
 $app = new yoshi\Application();
 
 $app->get('/hello/{name}', function ($name) {
-  return "Hello, $name!";
+  echo "Hello, $name!";
 });
 
 $app->run();
@@ -29,9 +29,15 @@ Yoshi requires PHP 5.3.
 
 * Redirects
 * Authentication Helper
+* Error Handling (e.g. Views render -> view not found)
+* Set HTTP Headers inside route callbacks
 
 
 ## Similar PHP micro frameworks
+
+Yoshi is nothing new. There are already some good PHP micro frameworks out there. I started Yoshi mainly for fun and to dig deeper into the development of a web framework.
+
+Here's a list of similar PHP micro frameworks:
 
  * [Silex][1]
  * [Slim][2]
