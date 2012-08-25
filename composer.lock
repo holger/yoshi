@@ -1,5 +1,14 @@
 {
-    "hash": "c07d8d72ebedd847f6743f89eefa22aa",
-    "packages": [],
-    "aliases": []
+    "hash": "64898b7929ca4fadca172ed5b0187565",
+    "packages": [
+
+    ],
+    "packages-dev": null,
+    "aliases": [
+
+    ],
+    "minimum-stability": "stable",
+    "stability-flags": [
+
+    ]
 }
