@@ -1,1 +1,1 @@
-Test <?= $this->function(); ?>
+Test <?php echo $this->function(); ?>

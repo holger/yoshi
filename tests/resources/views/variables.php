@@ -1,1 +1,1 @@
-Test <?= $variable; ?>
+Test <?php echo $variable; ?>
