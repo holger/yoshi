@@ -31,6 +31,7 @@ Yoshi requires PHP 5.3.
 * Authentication Helper
 * Error Handling (e.g. Views render -> view not found)
 * Set HTTP Headers inside route callbacks
+* Enable filter to end route processing
 
 
 ## Similar PHP micro frameworks
@@ -47,6 +48,14 @@ Here's a list of similar PHP micro frameworks:
  * [GluePHP][6]
  * [Flight][7]
  * [Epiphany][8]
+
+## Doku
+
+* Installation using composer
+# Using views
+# Global variables
+# Using callback methods for helpers (arrays vs. callback function objects)
+# Redirect using headers
 
 
 ## License

@@ -21,6 +21,11 @@ class Views {
   
   public function __construct($config = array()) {
     $this->config = array_merge($this->config, $config);
+    $this->addDefaultHelpers();
+  }
+
+  private function addDefaultHelpers() {
+    $this->helper('link', array(new UrlHelper(), 'link'));
   }
   
   public function create($template, $layout = null) {
