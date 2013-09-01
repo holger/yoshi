@@ -52,10 +52,10 @@ Here's a list of similar PHP micro frameworks:
 ## Doku
 
 * Installation using composer
-# Using views
-# Global variables
-# Using callback methods for helpers (arrays vs. callback function objects)
-# Redirect using headers
+* Using views
+* Global variables
+* Using callback methods for helpers (arrays vs. callback function objects)
+* Redirect using headers
 
 
 ## License
