@@ -49,7 +49,14 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     
     $this->assertContains('some header', $response->headers());
   }
-    
+
+  public function testRedirectShouldAddLocationHeader() {
+      $response = new ResponseMock();
+
+      $response->sendRedirect('./login');
+
+      $this->assertContains('Location: ./login', $response->headers());
+  }
 }
 
 ?>

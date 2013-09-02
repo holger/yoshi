@@ -64,7 +64,7 @@ class Application {
     $error = false;
 
     try {
-      $response->contents($this->router->handle($request));
+      $this->router->handle($request, $response);
     } catch (NotFoundException $e) {
       $response->status(404);
       $error = true;

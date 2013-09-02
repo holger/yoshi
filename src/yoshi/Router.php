@@ -53,13 +53,13 @@ class Router {
     return $this->routes;
   }
   
-  public function handle(Request $request) {
+  public function handle(Request $request, Response $response) {
     $matches_without_http_method = false;
     $allowed_methods = array();
     
     foreach ($this->routes as $route) {
       if ($route->matches($request)) {
-        return $this->execute($route, $request);
+        return $this->execute($route, $request, $response);
       }
       if ($route->matchesWithoutHttpMethod($request)) {
         $matches_without_http_method = true;
@@ -72,23 +72,24 @@ class Router {
     } else {
       throw new NotFoundException('Unable to find a route for ' . $request);
     }
-    return '';
   }
   
-  private function execute(Route $route, Request $request) {
-    $result = '';
-    
+  private function execute(Route $route, Request $request, Response $response) {
     foreach ($this->before_filters as $filter) {
-      $result .= call_user_func($filter);
+      $result = call_user_func_array($filter, array($response));
+      $response->appendContents($result);
+      if ($response->hasBeenSent()) return;
     }
     
-    $result .= $route->execute($request);
+    $result = $route->execute($request, $response);
+    $response->appendContents($result);
+    if ($response->hasBeenSent()) return;
     
     foreach ($this->after_filters as $filter) {
-      $result .= call_user_func($filter);
+      $result = call_user_func_array($filter, array($response));
+      $response->appendContents($result);
+      if ($response->hasBeenSent()) return;
     }
-    
-    return $result;
   }
   
   public function before($callback, $callback_method = null) {

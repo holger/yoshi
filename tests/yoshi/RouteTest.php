@@ -40,32 +40,46 @@ class RouteTest extends \PHPUnit_Framework_TestCase
   }
   
   public function testRoutesShouldExecuteCallbacksForMatchingRequests() {
-    $route = new Route('GET', '/test', function() { return 'GET /test'; });
+    $route = new Route('GET', '/test', function(Response $response) { $response->contents('GET /test'); });
 
     $request = Request::create('/test');
-    $this->assertEquals('GET /test', $route->execute($request));
+    $response = new ResponseMock();
+    $route->execute($request, $response);
+    $this->assertEquals('GET /test', $response->contents());
 
     $request = Request::create('/test', '', 'POST');
-    $this->assertEquals(null, $route->execute($request));
+    $response = new ResponseMock();
+    $route->execute($request, $response);
+    $this->assertEquals(null, $response->contents());
 
     $request = Request::create('/tested');
-    $this->assertEquals(null, $route->execute($request));
+    $response = new ResponseMock();
+    $route->execute($request, $response);
+    $this->assertEquals(null, $response->contents());
   }
 
   public function testRoutesShouldExecuteCallbacksForMatchingRequestsIncludingPathArguments() {
     $route = new Route('GET', '/user/{id}', function($id) { return 'GET /user/'.$id; });
     
     $request = Request::create('/user/1');
-    $this->assertEquals('GET /user/1', $route->execute($request));
+    $response = new ResponseMock();
+    $route->execute($request, $response);
+    $this->assertEquals('GET /user/1', $response->contents());
     
     $request = Request::create('/user/a');
-    $this->assertEquals('GET /user/a', $route->execute($request));
+    $response = new ResponseMock();
+    $route->execute($request, $response);
+    $this->assertEquals('GET /user/a', $response->contents());
     
     $request = Request::create('/user/1/');
-    $this->assertEquals(null, $route->execute($request));
+    $response = new ResponseMock();
+    $route->execute($request, $response);
+    $this->assertEquals(null, $response->contents());
     
     $request = Request::create('/user/');
-    $this->assertEquals(null, $route->execute($request));
+    $response = new ResponseMock();
+    $route->execute($request, $response);
+    $this->assertEquals(null, $response->contents());
   }
   
   public function testMatchesWithoutHttpMethodShouldReturnTrueForMatchingPaths() {
@@ -85,23 +99,36 @@ class RouteTest extends \PHPUnit_Framework_TestCase
   }
   
   public function testBeforeFilterShouldBeCalledBeforeCallbackGetsExecuted() {
-    $route = new Route('GET', '/test', function() { return 'callback'; });
-    $route->before(function() { return 'before1'; })
-          ->before(function() { return 'before2'; });
+    $route = new Route('GET', '/test', function(Response $response) { $response->appendContents('callback'); });
+    $route->before(function(Response $response) { $response->appendContents('before1'); })
+          ->before(function(Response $response) { $response->appendContents('before2'); });
     
-    $result = $route->execute(Request::create('/test'));
+    $response = new ResponseMock();
+    $route->execute(Request::create('/test'), $response);
     
-    $this->assertEquals('before1before2callback', $result);
+    $this->assertEquals('before1before2callback', $response->contents());
   }
 
   public function testAfterFilterShouldBeCalledAfterCallbackGetsExecuted() {
-    $route = new Route('GET', '/test', function() { return 'callback'; });
-    $route->after(function() { return 'after1'; })
-          ->after(function() { return 'after2'; });
+    $route = new Route('GET', '/test', function(Response $response) { $response->appendContents('callback'); });
+    $route->after(function(Response $response) { $response->appendContents('after1'); })
+          ->after(function(Response $response) { $response->appendContents('after2'); });
 
-    $result = $route->execute(Request::create('/test'));
+    $response = new ResponseMock();
+    $route->execute(Request::create('/test'), $response);
 
-    $this->assertEquals('callbackafter1after2', $result);
+    $this->assertEquals('callbackafter1after2', $response->contents());
+  }
+
+  public function testACompleteResponseShouldStopFurtherRouteExecution() {
+      $route = new Route('GET', '/test', function() { return 'callback'; });
+      $route->before(function(Response $response) { $response->sendRedirect('./login'); });
+
+      $response = new ResponseMock();
+      $route->execute(Request::create('/test'), $response);
+
+      $this->assertEquals('', $response->contents());
+      $this->assertContains('Location: ./login', $response->headers());
   }
     
 }

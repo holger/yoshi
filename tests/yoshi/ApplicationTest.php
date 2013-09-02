@@ -13,12 +13,12 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
   public function testRoutesShouldCallAssociatedCallbacks() {
     $app = new Application();
 
-    $app->get('/test', function() { return 'GET /test'; });
-    $app->post('/test', function() { return 'POST /test'; });
-    $app->put('/test', function() { return 'PUT /test'; });
-    $app->delete('/test', function() { return 'DELETE /test'; });
-    $app->head('/test', function() { return 'HEAD /test'; });
-    $app->options('/test', function() { return 'OPTIONS /test'; });
+    $app->get('/test', function(Response $response) { $response->contents('GET /test'); });
+    $app->post('/test', function(Response $response) { $response->contents('POST /test'); });
+    $app->put('/test', function(Response $response) { $response->contents('PUT /test'); });
+    $app->delete('/test', function(Response $response) { $response->contents('DELETE /test'); });
+    $app->head('/test', function(Response $response) { $response->contents('HEAD /test'); });
+    $app->options('/test', function(Response $response) { $response->contents('OPTIONS /test'); });
     
     $this->assertRoute('GET /test', $app, '/test');
     $this->assertRoute('POST /test', $app, '/test', 'post');
@@ -31,12 +31,12 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
   public function testAddRouteMethodShouldReturnAnInstanceOfRoute() {
     $app = new Application();
 
-    $this->assertInstanceOf('yoshi\Route', $app->get('/test', function() { return 'GET /test'; }));
-    $this->assertInstanceOf('yoshi\Route', $app->post('/test', function() { return 'POST /test'; }));
-    $this->assertInstanceOf('yoshi\Route', $app->put('/test', function() { return 'PUT /test'; }));
-    $this->assertInstanceOf('yoshi\Route', $app->delete('/test', function() { return 'DELETE /test'; }));
-    $this->assertInstanceOf('yoshi\Route', $app->head('/test', function() { return 'HEAD /test'; }));
-    $this->assertInstanceOf('yoshi\Route', $app->options('/test', function() { return 'OPTIONS /test'; }));
+    $this->assertInstanceOf('yoshi\Route', $app->get('/test', function(Response $response) { $response->contents('GET /test'); }));
+    $this->assertInstanceOf('yoshi\Route', $app->post('/test', function(Response $response) { $response->contents('POST /test'); }));
+    $this->assertInstanceOf('yoshi\Route', $app->put('/test', function(Response $response) { $response->contents('PUT /test'); }));
+    $this->assertInstanceOf('yoshi\Route', $app->delete('/test', function(Response $response) { $response->contents('DELETE /test'); }));
+    $this->assertInstanceOf('yoshi\Route', $app->head('/test', function(Response $response) { $response->contents('HEAD /test'); }));
+    $this->assertInstanceOf('yoshi\Route', $app->options('/test', function(Response $response) { $response->contents('OPTIONS /test'); }));
   }
   
   private function assertRoute($expected, $app, $uri, $method = 'get') {
@@ -80,35 +80,28 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
   
   public function testBeforeApplicationFiltersShouldBeCalledBeforeRouteExecution() {
     $app = new Application();
-    $app->get('/test', function() { return 'route'; });
-    $app->before(function() { return 'before1'; });
-    $app->before(function() { return 'before2'; });
-    
+    $app->get('/test', function(Response $response) { $response->appendContents('route')  ; });
+    $app->before(function(Response $response) { $response->appendContents('before1'); });
+    $app->before(function(Response $response) { $response->appendContents('before2'); });
+
     $response = new ResponseMock();
     $app->run(Request::create('/test'), $response);
-    
+
     $this->assertEquals('before1before2route', $response->contents());
   }
-  
+
   public function testAfterApplicationFiltersShouldBeCalledAfterRouteExecution() {
     $app = new Application();
-    $app->get('/test', function() { return 'route'; });
-    $app->after(function() { return 'after1'; });
-    $app->after(function() { return 'after2'; });
-    
+    $app->get('/test', function(Response $response) { $response->appendContents('route'); });
+    $app->after(function(Response $response) { $response->appendContents('after1'); });
+    $app->after(function(Response $response) { $response->appendContents('after2'); });
+
     $response = new ResponseMock();
     $app->run(Request::create('/test'), $response);
-    
+
     $this->assertEquals('routeafter1after2', $response->contents());
   }
-    
-}
 
-class ResponseMock extends Response {
-  
-  public function send() {
-  }
-  
 }
 
 ?>

@@ -13,6 +13,7 @@ class Response {
   private $reason_phrase;
   private $contents;
   private $headers = array();
+  protected $has_been_sent = false;
   
   private static $reason_phrases = array(
     '404' => 'Not Found',
@@ -24,6 +25,10 @@ class Response {
       $this->contents = $contents;
     }
     return $this->contents;
+  }
+
+  public function appendContents($contents) {
+      $this->contents .= $contents;
   }
   
   public function status($status_code = null, $reason_phrase = null) {
@@ -58,6 +63,16 @@ class Response {
       header($header);
     }
     echo $this->contents();
+    $this->has_been_sent = true;
+  }
+
+  public function sendRedirect($location) {
+    $this->header('Location: ' . $location);
+    $this->send();
+  }
+
+  public function hasBeenSent() {
+    return $this->has_been_sent;
   }
   
 }

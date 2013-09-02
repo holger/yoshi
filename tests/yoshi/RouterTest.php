@@ -75,12 +75,13 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
   
   public function testHandleShouldReturnCallbackResponseForMatchingRoute() {
     $router = new Router();
-    $router->get('/test', function() { return 'GET /test called'; });
+    $router->get('/test', function(Response $response) { $response->contents('GET /test called'); });
     $request = Request::create('/test');
 
-    $response = $router->handle($request);
+    $response = new ResponseMock();
+    $router->handle($request, $response);
     
-    $this->assertEquals('GET /test called', $response);
+    $this->assertEquals('GET /test called', $response->contents());
   }
   
   public function testHandleShouldThrowANotFoundExceptionForUnknownRequests() {
@@ -89,7 +90,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     $request = Request::create('/unknown-route');
     
     try {
-      $response = $router->handle($request);
+      $response = new ResponseMock();
+      $router->handle($request, $response);
     } catch(NotFoundException $e) {
       return;
     }
@@ -103,7 +105,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     $request = Request::create('/test', null, 'POST');
     
     try {
-      $response = $router->handle($request);
+      $response = new ResponseMock();
+      $router->handle($request, $response);
     } catch (MethodNotAllowedException $e) {
       return;
     }
@@ -117,7 +120,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     $request = Request::create('/test', null, 'POST');
     
     try {
-      $response = $router->handle($request);
+      $response = new ResponseMock();
+      $router->handle($request, $response);
     } catch (MethodNotAllowedException $e) {
       $this->assertEquals('GET', $e->allowedMethods());
       return;
@@ -128,19 +132,21 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
   
   public function testRouterFiltersShouldBeExcecutedBeforeAnyRouteExecution() {
     $router = new Router();
-    $router->before(function() { return 'before1'; })
-           ->before(function() { return 'before2'; })
-           ->after(function() { return 'after1'; })
-           ->after(function() { return 'after2'; });
+    $router->before(function(Response $response) { $response->appendContents('before1'); })
+           ->before(function(Response $response) { $response->appendContents('before2'); })
+           ->after(function(Response $response) { $response->appendContents('after1'); })
+           ->after(function(Response $response) { $response->appendContents('after2'); });
     
-    $router->get('/test', function() { return 'test'; });
-    $router->get('/foo', function() { return 'foo'; });
+    $router->get('/test', function(Response $response) { $response->appendContents('test'); });
+    $router->get('/foo', function(Response $response) { $response->appendContents('foo'); });
     
-    $response = $router->handle(Request::create('/test'));
-    $this->assertEquals('before1before2testafter1after2', $response);
+    $response = new ResponseMock();
+    $router->handle(Request::create('/test'), $response);
+    $this->assertEquals('before1before2testafter1after2', $response->contents());
     
-    $response = $router->handle(Request::create('/foo'));
-    $this->assertEquals('before1before2fooafter1after2', $response);
+    $response = new ResponseMock();
+    $router->handle(Request::create('/foo'), $response);
+    $this->assertEquals('before1before2fooafter1after2', $response->contents());
   }
   
   public function testRouterFiltersShouldBeExcecutedArroundRouteFilters() {
@@ -152,8 +158,23 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
            ->before(function() { return 'before_route'; })
            ->after(function() { return 'after_route'; });
     
-    $response = $router->handle(Request::create('/test'));
-    $this->assertEquals('before_routerbefore_routetestafter_routeafter_router', $response);
+    $response = new ResponseMock();
+    $router->handle(Request::create('/test'), $response);
+    $this->assertEquals('before_routerbefore_routetestafter_routeafter_router', $response->contents());
+  }
+
+  public function testACompleteResponseShouldStopFurtherRouteExecution() {
+    $router = new Router();
+    $router->before(function(Response $response) { $response->sendRedirect('./login'); })
+           ->after(function() { return 'after_router'; });
+
+    $router->get('/test', function() { return 'test'; });
+
+    $response = new ResponseMock();
+    $router->handle(Request::create('/test'), $response);
+
+    $this->assertEquals('', $response->contents());
+    $this->assertContains('Location: ./login', $response->headers());
   }
   
 }

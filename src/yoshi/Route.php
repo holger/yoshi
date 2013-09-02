@@ -28,23 +28,26 @@ class Route {
     $this->callback = $callback;
   }
 
-  public function execute(Request $request) {
-    $result = '';
-    
+  public function execute(Request $request, Response $response) {
     foreach ($this->before_filters as $filter) {
-      $result .= call_user_func($filter);
+      $result = call_user_func_array($filter, array($response));
+      $response->appendContents($result);
+      if ($response->hasBeenSent()) return;
     }
     
     if ($this->matches($request, true, $matches)) {
       array_shift($matches);
-      $result .= call_user_func_array($this->callback, $matches);
+      $matches []= $response;
+      $result = call_user_func_array($this->callback, $matches);
+      $response->appendContents($result);
+      if ($response->hasBeenSent()) return;
     }
     
     foreach ($this->after_filters as $filter) {
-      $result .= call_user_func($filter);
+      $result = call_user_func_array($filter, array($response));
+      $response->appendContents($result);
+      if ($response->hasBeenSent()) return;
     }
-    
-    return $result;
   }
 
   public function matches(Request $request, $include_http_method = true, &$matches = null) {
