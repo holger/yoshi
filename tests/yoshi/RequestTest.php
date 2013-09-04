@@ -42,7 +42,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
   public function testRootUriFromGlobals() {
       // $_SERVER['HTTPS']
-      $_SERVER['HTTP_HOST'] = 'localhost';
+      $_SERVER['SERVER_NAME'] = 'localhost';
       $_SERVER['SCRIPT_NAME'] = '/yoshi/index.php';
       $_SERVER['REQUEST_URI'] = '/yoshi/login';
       $_SERVER['REQUEST_METHOD'] = 'GET';

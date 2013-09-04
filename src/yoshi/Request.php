@@ -32,7 +32,7 @@ class Request {
   
   public static function createFromGlobals() {
     $https = !empty($_SERVER['HTTPS']) && $_SERVER["HTTPS"] == "on";
-        $host = $_SERVER['HTTP_HOST'];
+    $host = $_SERVER['SERVER_NAME'];
     $uri = $_SERVER['REQUEST_URI'];
     $script_name = $_SERVER['SCRIPT_NAME'];
     $method = $_SERVER['REQUEST_METHOD'];
