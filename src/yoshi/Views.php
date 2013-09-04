@@ -16,16 +16,13 @@ class Views {
     'LAYOUTS_PATH' => 'layouts/', 
     'DEFAULT_LAYOUT' => 'application.php'
   );
-  
+
+  private $application_variables = array();
   private $application_helpers = array();
   
   public function __construct($config = array()) {
     $this->config = array_merge($this->config, $config);
     $this->addDefaultHelpers();
-  }
-
-  private function addDefaultHelpers() {
-    $this->helper('link', array(new UrlHelper(), 'link'));
   }
   
   public function create($template, $layout = null) {
@@ -37,6 +34,7 @@ class Views {
     $layout = $this->config['TEMPLATES_PATH'] . $this->config['LAYOUTS_PATH'] . $layout;
     
     $view = new View($template, $layout);
+    $view->bind($this->application_variables);
     foreach ($this->application_helpers as $name => $callback) {
       $view->helper($name, $callback);
     }
@@ -44,11 +42,12 @@ class Views {
   }
 
   public function render($template, $data = array()) {
-    $view = $this->create($template);
-    foreach ($data as $name => $value) {
-      $view->bind($name, $value);
-    }
-    return $view->render();
+    return $this->create($template)->bind($data)->render();
+  }
+
+  public function bind($key, $value) {
+    $this->application_variables[$key] = $value;
+    return $this;
   }
   
   public function helper($name, $callback, $callback_method = null) {
@@ -60,6 +59,10 @@ class Views {
     }
     $this->application_helpers[$name] = $callback;
     return $this;
+  }
+
+  private function addDefaultHelpers() {
+    $this->helper('link', array(new UrlHelper(), 'link'));
   }
   
 }

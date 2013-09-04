@@ -21,8 +21,12 @@ class View {
     $this->layout = $layout;
   }
   
-  public function bind($key, $value) {
-    $this->variables[$key] = $value;
+  public function bind($keyOrArray, $value = null) {
+    if (is_array($keyOrArray)) {
+      $this->variables = array_merge($this->variables, $keyOrArray);
+    } else {
+      $this->variables[$keyOrArray] = $value;
+    }
     return $this;
   }
   

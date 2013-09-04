@@ -46,5 +46,12 @@ class ViewsTest extends \PHPUnit_Framework_TestCase
     
     $this->fail('Should not be able to register a helper with a name which is already used as method name inside of View class');
   }
+
+  public function testBoundVariablesShouldBeAccessibleInViews() {
+    $this->views->bind('variable', 'Content');
+    $content = $this->views->render('variables.php');
+
+    $this->assertEquals('Test Content', $content);
+  }
     
 }
