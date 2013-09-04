@@ -41,7 +41,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
   
   private function assertRoute($expected, $app, $uri, $method = 'get') {
     $response = new ResponseMock();
-    $app->run(Request::create($uri, '', $method), $response);
+    $app->run(Request::create(false, 'localhost', $uri, '', $method), $response);
     $this->assertEquals($expected, $response->contents());
   }
   
@@ -50,7 +50,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $app->get('/test', function() {});
     
     $response = new ResponseMock();
-    $app->run(Request::create('/unknown-route'), $response);
+    $app->run(Request::create(false, 'localhost', '/unknown-route'), $response);
     
     $this->assertEquals('404 Not Found', $response->status());
   }
@@ -61,7 +61,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $app->put('/test', function() {});
 
     $response = new ResponseMock();
-    $app->run(Request::create('/test', '', 'POST'), $response);
+    $app->run(Request::create(false, 'localhost', '/test', '', 'POST'), $response);
     
     $this->assertEquals('405 Method Not Allowed', $response->status());
     $this->assertContains('Allow: GET, PUT', $response->headers(), 'No header \'Allow: GET, PUT\' in ' . print_r($response->headers(), true));
@@ -72,7 +72,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $app->error(function() { return 'Error callback'; });
     
     $response = new ResponseMock();
-    $app->run(Request::create('/unknown-route'), $response);
+    $app->run(Request::create(false, 'localhost', '/unknown-route'), $response);
     
     $this->assertEquals('404 Not Found', $response->status());
     $this->assertEquals('Error callback', $response->contents());
@@ -85,7 +85,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $app->before(function(Response $response) { $response->appendContents('before2'); });
 
     $response = new ResponseMock();
-    $app->run(Request::create('/test'), $response);
+    $app->run(Request::create(false, 'localhost', '/test'), $response);
 
     $this->assertEquals('before1before2route', $response->contents());
   }
@@ -97,7 +97,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $app->after(function(Response $response) { $response->appendContents('after2'); });
 
     $response = new ResponseMock();
-    $app->run(Request::create('/test'), $response);
+    $app->run(Request::create(false, 'localhost', '/test'), $response);
 
     $this->assertEquals('routeafter1after2', $response->contents());
   }

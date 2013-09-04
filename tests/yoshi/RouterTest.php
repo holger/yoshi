@@ -70,13 +70,13 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     $this->assertEquals(1, count($routes));
     $this->assertTrue(is_array($routes));
     $this->assertTrue($routes[0] instanceof Route);
-    $this->assertTrue($routes[0]->matches(Request::create($path, null, $http_method)));
+    $this->assertTrue($routes[0]->matches(Request::create(false, 'localhost', $path, null, $http_method)));
   }
   
   public function testHandleShouldReturnCallbackResponseForMatchingRoute() {
     $router = new Router();
     $router->get('/test', function(Response $response) { $response->contents('GET /test called'); });
-    $request = Request::create('/test');
+    $request = Request::create(false, 'localhost', '/test');
 
     $response = new ResponseMock();
     $router->handle($request, $response);
@@ -87,7 +87,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
   public function testHandleShouldThrowANotFoundExceptionForUnknownRequests() {
     $router = new Router();
     $router->get('/test', function() {});
-    $request = Request::create('/unknown-route');
+    $request = Request::create(false, 'localhost', '/unknown-route');
     
     try {
       $response = new ResponseMock();
@@ -102,7 +102,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
   public function testHandleShouldThrowAMethodNotAllowedExceptionForRequestWithAnUnsupportedHttpMethod() {
     $router = new Router();
     $router->get('/test', function() {});
-    $request = Request::create('/test', null, 'POST');
+    $request = Request::create(false, 'localhost', '/test', null, 'POST');
     
     try {
       $response = new ResponseMock();
@@ -117,7 +117,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
   public function testHandleShouldAddAllowedMethodsForThrownMethodNotAllowedException() {
     $router = new Router();
     $router->get('/test', function() {});
-    $request = Request::create('/test', null, 'POST');
+    $request = Request::create(false, 'localhost', '/test', null, 'POST');
     
     try {
       $response = new ResponseMock();
@@ -141,11 +141,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     $router->get('/foo', function(Response $response) { $response->appendContents('foo'); });
     
     $response = new ResponseMock();
-    $router->handle(Request::create('/test'), $response);
+    $router->handle(Request::create(false, 'localhost', '/test'), $response);
     $this->assertEquals('before1before2testafter1after2', $response->contents());
     
     $response = new ResponseMock();
-    $router->handle(Request::create('/foo'), $response);
+    $router->handle(Request::create(false, 'localhost', '/foo'), $response);
     $this->assertEquals('before1before2fooafter1after2', $response->contents());
   }
   
@@ -159,7 +159,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
            ->after(function() { return 'after_route'; });
     
     $response = new ResponseMock();
-    $router->handle(Request::create('/test'), $response);
+    $router->handle(Request::create(false, 'localhost', '/test'), $response);
     $this->assertEquals('before_routerbefore_routetestafter_routeafter_router', $response->contents());
   }
 
@@ -171,7 +171,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     $router->get('/test', function() { return 'test'; });
 
     $response = new ResponseMock();
-    $router->handle(Request::create('/test'), $response);
+    $router->handle(Request::create(false, 'localhost', '/test'), $response);
 
     $this->assertEquals('', $response->contents());
     $this->assertContains('Location: ./login', $response->headers());

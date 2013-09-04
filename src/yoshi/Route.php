@@ -51,7 +51,7 @@ class Route {
   }
 
   public function matches(Request $request, $include_http_method = true, &$matches = null) {
-    $path = str_replace($request->rootUri(), '', $request->uriPath());
+    $path = str_replace($request->baseUri(), '', $request->uriPath());
     $method = $request->method();
 
     if ($include_http_method) {

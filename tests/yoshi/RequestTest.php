@@ -11,12 +11,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 {
   
   public function testRequestPartShouldBeSplittedFromRequestUri() {
-    $request = Request::create('/test?url=1234');
+    $request = Request::create(false, 'localhost', '/test?url=1234');
     $this->assertEquals('GET', $request->method());
     $this->assertEquals('/test?url=1234', $request->uri());
     $this->assertEquals('/test', $request->uriPath());
     
-    $request = Request::create('http://www.test.de/test?url=1234');
+    $request = Request::create(false, 'localhost', 'http://www.test.de/test?url=1234');
     $this->assertEquals('GET', $request->method());
     $this->assertEquals('http://www.test.de/test?url=1234', $request->uri());
     $this->assertEquals('/test', $request->uriPath());
@@ -39,24 +39,36 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals('http://www.test.de/test?url=1234', $request->uri());
     $this->assertEquals('/test', $request->uriPath());
   }
-  
-  public function testCreateWithScriptNameShouldSetRootUri() {
-    $request = Request::create('/webroot/test', '/webroot');
-    
-    $this->assertEquals('/webroot', $request->rootUri());
+
+  public function testRootUriFromGlobals() {
+      // $_SERVER['HTTPS']
+      $_SERVER['HTTP_HOST'] = 'localhost';
+      $_SERVER['SCRIPT_NAME'] = '/yoshi/index.php';
+      $_SERVER['REQUEST_URI'] = '/yoshi/login';
+      $_SERVER['REQUEST_METHOD'] = 'GET';
+
+      $request = Request::createFromGlobals();
+
+      $this->assertEquals('http://localhost/yoshi', $request->rootUri());
   }
   
-  public function testCreateFormGlobalsWithScriptNameShouldSetRootUri() {
+  public function testCreateWithScriptNameShouldSetBaseUri() {
+    $request = Request::create(false, 'localhost', '/webroot/test', '/webroot');
+    
+    $this->assertEquals('/webroot', $request->baseUri());
+  }
+  
+  public function testCreateFormGlobalsWithScriptNameShouldSetBaseUri() {
     $_SERVER['REQUEST_URI'] = '/webroot/test';
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $_SERVER['SCRIPT_NAME'] = '/webroot';
     $request = Request::createFromGlobals();
     
-    $this->assertEquals('/webroot', $request->rootUri());
+    $this->assertEquals('/webroot', $request->baseUri());
   }
   
   public function testToStringShouldReturnMethodAndUri() {
-    $request = Request::create('/test?url=1234');
+    $request = Request::create(false, 'localhost', '/test?url=1234');
     
     $this->assertEquals('GET /test?url=1234', (string)$request);
   }

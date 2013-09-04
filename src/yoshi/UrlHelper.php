@@ -13,6 +13,14 @@ class UrlHelper {
     if ($request === null) {
       $request = Request::createFromGlobals();
     }
+    return $request->baseUri() . '/' . ltrim($path, '/');
+  }
+
+
+  public function absoluteLink($path, Request $request = null) {
+    if ($request === null) {
+      $request = Request::createFromGlobals();
+    }
     return $request->rootUri() . '/' . ltrim($path, '/');
   }
   

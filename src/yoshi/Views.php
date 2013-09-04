@@ -63,6 +63,7 @@ class Views {
 
   private function addDefaultHelpers() {
     $this->helper('link', array(new UrlHelper(), 'link'));
+    $this->helper('absoluteLink', array(new UrlHelper(), 'absoluteLink'));
   }
   
 }

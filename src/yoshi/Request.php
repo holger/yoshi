@@ -8,30 +8,42 @@
 namespace yoshi;
 
 class Request {
-  
+
+  private $https;
+  private $host;
   private $uri;
   private $uri_path;
   private $method;
   private $script_name;
 
-  public static function create($uri, $script_name = null, $method = 'GET') {
+  public static function create($https, $host, $uri, $script_name = null, $method = 'GET') {
     $request = new Request();
+    $request->https = $https;
+    $request->host = $host;
     $request->method = $method;
+    $request->script_name = $script_name;
+
     $url_parts = parse_url($uri);
     $request->uri = $uri;
     $request->uri_path = $url_parts['path'];
-    $request->script_name = $script_name;
+
     return $request;
   }
   
   public static function createFromGlobals() {
+    $https = !empty($_SERVER['HTTPS']) && $_SERVER["HTTPS"] == "on";
+    $host = $_SERVER['HTTP_HOST'];
     $uri = $_SERVER['REQUEST_URI'];
     $script_name = $_SERVER['SCRIPT_NAME'];
     $method = $_SERVER['REQUEST_METHOD'];
-    return self::create($uri, $script_name, $method);
+    return self::create($https, $host, $uri, $script_name, $method);
+  }
+
+  public function rootUri() {
+      return 'http' . ($this->https ? 's' : '') . '://' . $this->host . $this->baseUri();
   }
   
-  public function rootUri() {
+  public function baseUri() {
     if ($this->script_name == null) {
       return '';
     }
