@@ -31,11 +31,11 @@ class Request {
   }
   
   public static function createFromGlobals() {
-    $https = !empty($_SERVER['HTTPS']) && $_SERVER["HTTPS"] == "on";
-    $host = $_SERVER['SERVER_NAME'];
-    $uri = $_SERVER['REQUEST_URI'];
-    $script_name = $_SERVER['SCRIPT_NAME'];
-    $method = $_SERVER['REQUEST_METHOD'];
+    $https = isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER["HTTPS"] == "on";
+    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+    $uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+    $script_name = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
+    $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : '';
     return self::create($https, $host, $uri, $script_name, $method);
   }
 
