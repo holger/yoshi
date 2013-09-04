@@ -59,7 +59,8 @@ class Router {
     
     foreach ($this->routes as $route) {
       if ($route->matches($request)) {
-        return $this->execute($route, $request, $response);
+        $this->execute($route, $request, $response);
+        return;
       }
       if ($route->matchesWithoutHttpMethod($request)) {
         $matches_without_http_method = true;
@@ -81,8 +82,7 @@ class Router {
       if ($response->hasBeenSent()) return;
     }
     
-    $result = $route->execute($request, $response);
-    $response->appendContents($result);
+    $route->execute($request, $response);
     if ($response->hasBeenSent()) return;
     
     foreach ($this->after_filters as $filter) {

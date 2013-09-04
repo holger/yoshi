@@ -24,7 +24,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
   }
   
   public function testRoutesShouldMatchRequestPathsWithPattern() {
-    $route = new Route('GET', '/user/{id}', function($id) { return 'GET /user/{id}'; });
+    $route = new Route('GET', '/user/{id}', function($id) { return 'GET /user/'.$id; });
     
     $request = Request::create(false, 'localhost', '/user/1');
     $this->assertTrue($route->matches($request));
