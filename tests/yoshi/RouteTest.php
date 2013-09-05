@@ -122,13 +122,12 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
   public function testACompleteResponseShouldStopFurtherRouteExecution() {
       $route = new Route('GET', '/test', function() { return 'callback'; });
-      $route->before(function(Response $response) { $response->sendRedirect('./login'); });
+      $route->before(function(Response $response) { $response->send(); });
 
       $response = new ResponseMock();
       $route->execute(Request::create(false, 'localhost', '/test'), $response);
 
       $this->assertEquals('', $response->contents());
-      $this->assertContains('Location: ./login', $response->headers());
   }
     
 }

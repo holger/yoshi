@@ -51,12 +51,17 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
   }
 
   public function testRedirectShouldAddLocationHeader() {
+      $_SERVER['HTTP_HOST'] = 'localhost';
+      $_SERVER['SCRIPT_NAME'] = '/yoshi/index.php';
+      $_SERVER['REQUEST_URI'] = '/yoshi/login';
+      $_SERVER['REQUEST_METHOD'] = 'GET';
       $response = new ResponseMock();
 
-      $response->sendRedirect('./login');
+      $response->sendRedirect('/login');
 
-      $this->assertContains('Location: ./login', $response->headers());
+      $this->assertContains('Location: /yoshi/login', $response->headers());
   }
+
 }
 
 ?>

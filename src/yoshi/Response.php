@@ -67,6 +67,8 @@ class Response {
   }
 
   public function sendRedirect($location) {
+    $request = Request::createFromGlobals();
+    $location = $request->baseUri() . '/' . ltrim($location, '/');
     $this->header('Location: ' . $location);
     $this->send();
   }

@@ -165,7 +165,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
   public function testACompleteResponseShouldStopFurtherRouteExecution() {
     $router = new Router();
-    $router->before(function(Response $response) { $response->sendRedirect('./login'); })
+    $router->before(function(Response $response) { $response->send(); })
            ->after(function() { return 'after_router'; });
 
     $router->get('/test', function() { return 'test'; });
@@ -174,7 +174,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     $router->handle(Request::create(false, 'localhost', '/test'), $response);
 
     $this->assertEquals('', $response->contents());
-    $this->assertContains('Location: ./login', $response->headers());
   }
   
 }
