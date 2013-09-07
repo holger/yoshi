@@ -58,6 +58,10 @@ class Request {
   public function uriPath() {
     return $this->uri_path;
   }
+
+  public function path() {
+    return substr($this->uriPath(), strlen($this->baseUri()));
+  }
   
   public function method() {
     return $this->method;

@@ -51,6 +51,17 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
       $this->assertEquals('http://localhost/yoshi', $request->rootUri());
   }
+
+  public function testPathShouldStartFromBase() {
+      $_SERVER['HTTP_HOST'] = 'localhost';
+      $_SERVER['SCRIPT_NAME'] = '/yoshi/index.php';
+      $_SERVER['REQUEST_URI'] = '/yoshi/login';
+      $_SERVER['REQUEST_METHOD'] = 'GET';
+
+      $request = Request::createFromGlobals();
+
+      $this->assertEquals('/login', $request->path());
+  }
   
   public function testCreateWithScriptNameShouldSetBaseUri() {
     $request = Request::create(false, 'localhost', '/webroot/test', '/webroot');
