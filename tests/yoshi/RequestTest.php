@@ -84,7 +84,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals('GET /test?url=1234', (string)$request);
   }
 
-  public function testMethodCanBeInjected() {
+  public function testMethodCanBeInjectedViaGetParam() {
     $request = Request::create(false, 'localhost', '/test?_method=put');
     $this->assertEquals('PUT', $request->method());
 
@@ -92,6 +92,19 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $request = Request::createFromGlobals();
     $this->assertEquals('PUT', $request->method());
+  }
+
+  public function testMethodCanBeInjectedViaPostParam() {
+    $_POST['_method'] = 'put';
+    $request = Request::create(false, 'localhost', '/test');
+    $this->assertEquals('PUT', $request->method());
+
+    $_SERVER['REQUEST_URI'] = '/test';
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $request = Request::createFromGlobals();
+    $this->assertEquals('PUT', $request->method());
+
+    unset($_POST['_method']);
   }
 
 }

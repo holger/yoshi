@@ -33,6 +33,9 @@ class Request {
           $request->method = strtoupper($query['_method']);
         }
     }
+    if (isset($_POST['_method'])) {
+      $request->method = strtoupper($_POST['_method']);
+    }
 
     return $request;
   }
