@@ -27,6 +27,13 @@ class Request {
     $request->uri = $uri;
     $request->uri_path = $url_parts['path'];
 
+    if(isset($url_parts['query'])) {
+        parse_str($url_parts['query'], $query);
+        if (isset($query['_method'])) {
+          $request->method = strtoupper($query['_method']);
+        }
+    }
+
     return $request;
   }
   
@@ -36,6 +43,7 @@ class Request {
     $uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
     $script_name = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
     $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : '';
+    //$_SERVER['QUERY_STRING']
     return self::create($https, $host, $uri, $script_name, $method);
   }
 

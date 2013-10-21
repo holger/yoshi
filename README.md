@@ -27,12 +27,11 @@ Yoshi requires PHP 5.3.
 
 ## Open Issues
 
-* Redirects
 * Authentication Helper
 * Error Handling (e.g. Views render -> view not found)
 * Set HTTP Headers inside route callbacks
 * Enable filter to end route processing
-
+* Request object injection collides with default values for arguments
 
 ## Similar PHP micro frameworks
 
