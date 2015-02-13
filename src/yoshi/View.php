@@ -15,6 +15,8 @@ class View {
   protected $layout;
   protected $variables = array();
   protected $helpers = array();
+  protected $partials = array();
+  protected $current_partial_key;
   
   public function __construct($view, $layout = null) {
     $this->view = $view;
@@ -50,6 +52,25 @@ class View {
       return call_user_func_array($helper, $arguments);
     }
   }
+
+  public function content_for($key, $value = null) {
+    if( ! isset($value) ) {
+      $this->current_partial_key = $key; 
+      ob_start();
+    }
+    else {
+      $this->partials[$key] = $value;
+    }
+  }
+  
+  public function end_content_for() {
+    if(is_null($this->current_partial_key)) {
+      return;
+    }
+
+    $this->partials[$this->current_partial_key] .= ob_get_clean();
+    $this->current_partial_key = null;  
+  }
   
   public function render() {
     if (file_exists($this->view) === false) {
@@ -64,6 +85,7 @@ class View {
     ob_clean();
     
     if (file_exists($this->layout)) {
+      extract($this->partials);
       include $this->layout;
       $site = ob_get_contents();
     } else {  
