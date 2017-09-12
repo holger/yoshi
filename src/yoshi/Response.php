@@ -56,11 +56,11 @@ class Response {
   }
   
   public function send() {
-    if (!empty($this->status)) {
-      header(sprintf('HTTP/1.0 %s', $this->status()));
-    }
     foreach ($this->headers as $header) {
       header($header);
+    }
+    if ($this->status_code !== null) {
+      header(sprintf('HTTP/1.1 %s', $this->status()));
     }
     echo $this->contents();
     $this->has_been_sent = true;
