@@ -8,6 +8,8 @@
 namespace yoshi;
 
 use Exception;
+use yoshi\viewhelpers\RenderPartialHelper;
+use yoshi\viewhelpers\UrlHelper;
 
 class Views {
 
@@ -25,13 +27,15 @@ class Views {
     $this->addDefaultHelpers();
   }
   
-  public function create($template, $layout = null) {
-    if ($layout === null) {
+  public function create($template, $layout = 'DEFAULT_LAYOUT') {
+    if ($layout == 'DEFAULT_LAYOUT') {
       $layout = $this->config['DEFAULT_LAYOUT'];
     }
-   
+    if ($layout !== null) {
+      $layout = $this->config['TEMPLATES_PATH'] . $this->config['LAYOUTS_PATH'] . $layout;
+    }
+
     $template = $this->config['TEMPLATES_PATH'] . $template;
-    $layout = $this->config['TEMPLATES_PATH'] . $this->config['LAYOUTS_PATH'] . $layout;
     
     $view = new View($template, $layout);
     $view->bind($this->application_variables);
@@ -64,6 +68,7 @@ class Views {
   private function addDefaultHelpers() {
     $this->helper('link', array(new UrlHelper(), 'link'));
     $this->helper('absoluteLink', array(new UrlHelper(), 'absoluteLink'));
+    $this->helper('renderPartial', array(new RenderPartialHelper($this), 'renderPartial'));
   }
   
 }

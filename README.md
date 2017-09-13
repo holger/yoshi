@@ -14,7 +14,7 @@ $app->run();
 ?>
 ```
 
-Yoshi requires PHP 5.3.
+Yoshi requires PHP 5.6.
 
 
 ## Features
